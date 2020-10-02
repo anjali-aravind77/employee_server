@@ -1,7 +1,8 @@
 
+const { User } = require('./db');
 const db = require('./db');
 
-const register = (username,password,empid,name,emailid,phone,designation,address) => {
+const employeeregister = (username,password,empid,name,emailid,phone,designation,address) => {
     return db.User.findOne({
       empid
     })
@@ -19,20 +20,34 @@ const register = (username,password,empid,name,emailid,phone,designation,address
       });
       newUser.save();
       return {
-        status: true,
+        success: true,
+        data: {
+          "log_id" : 1,
+          "emp_id" : newUser.empid,
+          "emp_name" : newUser.username,
+          "emp_email" : newUser.emailid,
+          "emp_phone" : newUser.phone,
+          "emp_designation" : newUser.designation,
+          "emp_address" : newUser.address,
+          "emp_status" : 1
+        },
         statusCode: 200,
         message: "employee created succesfully"
       }
     });
 }
-const login = (username, password) => {
+let currentUser;
+const login = (req, username, password) => {
     return db.User.findOne({
      username, password
     })
     .then(user => {
     //  console.log(user)
-      if(user) {
-        // req.session.currentUser = accno1;
+      if(user) {   
+        //  console.log(user)
+
+         req.session.currentUser = user.empid;
+        //  console.log( req.session.currentUser);
         return {
           status: true,
           statusCode: 200,
@@ -49,17 +64,26 @@ const login = (username, password) => {
 }
 
 const logout = (req) => {
-  req.User.deleteToken(req.empid, (err, user) => {
-    return {
-      message: "logged out succesfully"
-    }
+  return db.User.findOne({
+    empid
   })
+  .then (user => {
+    if(user) {
+    req.User.deleteToken(user.empid, (err, user) => {
+      return {
+        success: true,
+        data: 1,
+        message: "logout succesfully"
+      }
+    })
+  }
+  })
+ 
     
-}
-  
+} 
 
 module.exports = {
-    register,
+  employeeregister,
     login,
     logout
 }

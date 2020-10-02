@@ -38,16 +38,9 @@ const authMiddleWare = (req, res, next) => {
     }
 }
 
-app.get("/", (req, res)=>{
-    res.send("hello world..!!!")
-})
 
-app.get("/register", (req, res)=>{
-    res.send("hello world..!!!")
-});
-
-app.post("/register", (req, res)=>{
-    dataService.register(req.body.username, req.body.password, req.body.empid, req.body.name, req.body.emailid, 
+app.post("/employeeregister", (req, res)=>{
+    dataService.employeeregister(req.body.username, req.body.password, req.body.empid, req.body.name, req.body.emailid, 
         req.body.phone, req.body.designation, req.body.address)
     .then(result => {
         res.status(result.statusCode).json(result);
@@ -59,14 +52,14 @@ app.post("/register", (req, res)=>{
 });
 
 app.post("/login", (req, res)=>{
-     dataService.login(req.body.username, req.body.password)
+     dataService.login(req, req.body.username, req.body.password)
     .then(result => {
         res.status(result.statusCode).json(result);
     });
 });
 
-app.get('/logout',authMiddleWare, (req,res) => {
-    dataService.logout(req.body.empid)
+app.post('/logout',authMiddleWare, (req,res) => {
+    dataService.logout(req.body.username)
     .then(result => {
         res.status(result.statusCode).json(result);
     })
